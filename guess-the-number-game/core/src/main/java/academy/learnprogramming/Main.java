@@ -19,7 +19,7 @@ public class Main {
         // NOTE: using an interface (left) and a class to the right
         ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(CONFIG_LOCATION);
 
-        // get numer generator bean from context (container)
+        // get number generator bean from context (container); name has to match the Id of the bean.xml file
         NumberGenerator numberGenerator = context.getBean("numberGenerator", NumberGenerator.class);
 
         // call methods next() to get a random number
@@ -29,11 +29,7 @@ public class Main {
         // get game bean from context (container)
         Game game = context.getBean(Game.class);
 
-        // call reset method
-        game.reset();
-
         // close context (container) - doing that to prevent any memory resource leaks
         context.close();
-
     }
 }
