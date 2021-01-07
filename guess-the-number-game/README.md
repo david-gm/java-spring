@@ -274,3 +274,72 @@ public class AppConfig {
 ```
 - name of the bean is the name of the bean method
 - bean methods are useful, where we need additional configuration for our bean
+
+## Application Event
+
+- The `ApplicationContext` interface has a parent interface `ApplicationEventPublisher` that encapsulates 
+  event publication functionalities (this means it is availabel also in `Application Context`).
+  
+- Event handling in the `ApplicationContext` is provided through the `ApplicationEvent` class and `ApplicationListener` interface.
+- If a bean that omplements the `ApplicationListener` interface is deployed into the context,
+  every time an `ApplicationEvent` gets published to the `ApplicationContext`, 
+  that bean is notified.
+  
+- --> Standard **Observer-Design pattern**
+
+One method is override the approriate method if the interface:
+```java
+@Component
+public class ConsoleNumberGuess implements ApplicationListener<ContextRefreshedEvent> {
+
+    // == constants ==
+    private static final Logger log = LoggerFactory.getLogger(ConsoleNumberGuess.class);
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+        // Context RefreshedEvent is published when the ApplicationContext is initialized or refreshed
+        // --> all beans are loaded, singletons are pre-instantiated, ...
+
+        log.info("Container ready to use.");
+
+    }
+}
+```
+
+Another method is to use annotations:
+```java
+@Component
+public class ConsoleNumberGuess {
+
+    // == constants ==
+    private static final Logger log = LoggerFactory.getLogger(ConsoleNumberGuess.class);
+
+    @EventListener
+    // Note: the parameter contextRefreshedEvent defines the event
+    public void onStart(ContextRefreshedEvent contextRefreshedEvent) {
+        // Context RefreshedEvent is published when the ApplicationContext is initialized or refreshed
+        // --> all beans are loaded, singletons are pre-instantiated, ...
+      
+
+        log.info("onStart(): Container ready to use.");
+    }
+}
+```
+
+Alternatively add an event type to the annotation instead of an unused parameter in the example above (`contextRefreshedEvent`):
+```java
+@Component
+public class ConsoleNumberGuess {
+
+    // == constants ==
+    private static final Logger log = LoggerFactory.getLogger(ConsoleNumberGuess.class);
+
+    @EventListener(ContextRefreshedEvent.class)
+    public void onStart() {
+        // Context RefreshedEvent is published when the ApplicationContext is initialized or refreshed
+        // --> all beans are loaded, singletons are pre-instantiated, ...
+
+        log.info("onStart(): Container ready to use.");
+    }
+}
+```
