@@ -188,4 +188,89 @@ Total changes:
 5. In `GameImpl.java` the setter for NumberGenerator is not needed anymore - can be deleted
 6. Add `@Autowired` to the field `numberGenerator`
 
+## Beans as Components
 
+- how to auto scan a package for components
+- how to use the `@Component` annotation
+- Spring provides several "stereotype" annotations:
+    - @Component
+    - @Service
+    - @Controller
+- stereotype means: something conforming to a fixed or general pattern
+- Stereotype annotations are markers for any class that fulfills a role within an application
+    - no need to use Spring XML based configuration for these components
+- @Component is generic stereotype for any Spring-managed component.
+- @Repository, @Service, @Controller are specializations of @Component for specific use cases
+
+To use this, we need to enable the components scan in `bean.xml`:
+- delete the tag `<context:annotation-config />`
+- add the tag `<context:component-scan base-package="academy.learnprogramming" />`
+- since the component scan is enabled now, we can remove any DI beans of `beans.xml`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="academy.learnprogramming" />
+</beans>
+```
+
+- add a `@Component` to the classes `NumberGeneratorImpl` and `GameImpl`
+- we do not add this annotation to the interface classes, since it would introduce a dependency on string
+- execution of the code leads to exception, since the bean with the name "numberGenerator" is not found.
+  Spring creates beans based on the class name, so it created a bean named "numberGeneratorImpl", 
+  but in the main method, we ask for a bean called "numberGenerator".
+- we can define a name for a bean by using `@Component("numberGenerator)`.
+- it is better to get the bean by type
+    - this does not work, if multiple implementation of an interface are defined. 
+      In the case of multiple implementations, we need to use qualifiers to specificy the correct implementation.
+      
+## Use Java Annotation Configuration
+
+- use an Annotation Configuration
+- use the @Configuration annotation
+- use the @ComponentScan annotation
+- use the @Bean annotation
+  
+We need to create a class within our project that represents a configuration for our Spring container.
+- delete `beans.xml`
+- create a new class `AppConfig`
+```java
+@Configuration
+@ComponentScan(basePackages = "academy.learnprogramming")
+public class AppConfig {
+}
+```
+- delete the old XML Config Application Context in `Main.java` and replace it with:
+```java
+ConfigurableApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+```
+
+- oftentimes these config classes hold bean methods: methods that instantiate classes
+- remove the @Component in `NumberGeneratorImpl` and `GameImpl`
+- add bean methods to `AppConfig`:
+```java
+@Configuration
+@ComponentScan(basePackages = "academy.learnprogramming") // searches for @Component annotations
+public class AppConfig {
+
+    // == bean methods ==
+    @Bean
+    public NumberGenerator numberGenerator() {
+        return new NumberGeneratorImpl();
+    }
+
+    @Bean
+    public Game game() {
+        return new GameImpl();
+    }
+}
+```
+- name of the bean is the name of the bean method
+- bean methods are useful, where we need additional configuration for our bean
