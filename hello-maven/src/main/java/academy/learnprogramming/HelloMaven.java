@@ -10,7 +10,7 @@ public class HelloMaven {
     public static void main(String[] args) {
         System.out.println("Hello Maven");
         Test t = new Test(5);
-        t.print();
+        t.print(); //
 
         log.info("Hello Info");
         log.debug("Hello Debug");
