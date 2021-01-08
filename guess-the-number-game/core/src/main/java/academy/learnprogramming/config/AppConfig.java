@@ -14,11 +14,6 @@ public class AppConfig {
     // == bean methods ==
     // name of the bean is the name of the bean method
     @Bean
-    public NumberGenerator numberGenerator() {
-        return new NumberGeneratorImpl();
-    }
-
-    @Bean
     public Game game() {
         return new GameImpl();
     }

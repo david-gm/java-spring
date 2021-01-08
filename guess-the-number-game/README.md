@@ -479,3 +479,31 @@ public class GameConfig {
     private int guessCount;
 }
 ```
+
+## Use @Component instead of bean methods
+- instead of creating bean methods in `AppConfig` we can use the `@Component` annotation on the `NumberGeneraorImpl` class instead:
+  - The IoC Spring container will find the corresponding class based on the type and the `@Component` annotation
+```java
+@Component
+public class NumberGeneratorImpl implements NumberGenerator {
+}
+```
+- The bean method is only used when we need some configuration or initialization of our bean done
+  (i.e Factory Methods).
+
+## Constructor Injection
+
+- considered best practice
+  - instead of using the `@Autowire` annotation on fields, we use `@Autowired` to the constructor
+  - it is common practice to make the instance variables, that we set through the constructor `final`
+  - note that custom qualifiers are used for `maxNumber` and `minNumber`
+```java
+public class NumberGeneratorImpl implements NumberGenerator {
+    @Autowired
+    public NumberGeneratorImpl(@MaxNumber int maxNumber, @MinNumber int minNumber) {
+      this.maxNumber = maxNumber;
+      this.minNumber = minNumber;
+    }
+  }
+```
+
