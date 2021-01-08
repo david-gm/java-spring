@@ -231,12 +231,15 @@ To use this, we need to enable the components scan in `bean.xml`:
     - this does not work, if multiple implementation of an interface are defined. 
       In the case of multiple implementations, we need to use qualifiers to specificy the correct implementation.
       
-## Use Java Annotation Configuration
+## Use Java Annotation Configuration (@Configuration)
 
 - use an Annotation Configuration
 - use the @Configuration annotation
 - use the @ComponentScan annotation
 - use the @Bean annotation
+
+The `@Configuration` annotation is on a class-level and tells Spring that this class contains one or more @Bean methods
+and may be processed by the Spring container to generate bean definitions.
   
 We need to create a class within our project that represents a configuration for our Spring container.
 - delete `beans.xml`
@@ -341,5 +344,138 @@ public class ConsoleNumberGuess {
 
         log.info("onStart(): Container ready to use.");
     }
+}
+```
+
+## Qualifiers
+
+- A problem of automatic autowiring occurs, if the method that creates a bean is renamed, but the field that requires the bean, is not renamed:
+  - You will get a runtime exception, as the bean cannot be assigned to autoired field
+  - Solution: Qualifiers
+- When there is a need for fine-tuning annotation-based autowiring we can use qualifiers
+- A qualifier is an annotation that you apply to a bean
+- The `@Primary` annotation is an effective way to use autowiring by type with several
+  instances when one primary candidate can be determined
+  
+- When more control over the selection process is required, the `@Qualifier` annotation can be used
+- You can associate qualifier values with specific arguments, narrowing the set of type matches so that
+  a specific bean is chosen for each argument
+  
+- You can create your own custon qualifier annotations. Simply define an annotation and provide the 
+  `@Qualifier` annotation within your definition.
+  
+Import a `@Configuration` class to another `@Configuration` class:
+```java
+@Configuration
+public class GameConfig {
+}
+
+@Configuration
+@Import(GameConfig.class)
+@ComponentScan(basePackages = "academy.learnprogramming") // searches for @Component annotations
+public class AppConfig {
+}
+```
+
+Fine tuning annotation based autowiring:
+- Create a custom qualifier:
+  - @interface creates a new annotation type
+  - @Target: determines that our annotation can be added to fields, parameters of methods
+  - @Retention: Indicates how long annotations with the annotated type are to be retained. If no Retention annotation is present on an annotation type declaration, the retention policy defaults to RetentionPolicy.CLASS
+    - three retetnion policies:
+      - SOURCE – where the annotations are removed by the compiler
+      - CLASS – Annotations are present in the bytecode, but are not present at runtime and hence not available when trying to reflectively determine if a class has the annotation.
+      - RUNTIME – Annotations are retained in the byte code and is available at runtime and hence can be reflectively found on a class.
+  - @Qualifier: used annotate other custom annotations that can in turn be used as qualifiers
+```java
+@Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@Qualifier
+public @interface MaxNumber {
+}
+
+@Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@Qualifier
+public @interface GuessCount {
+}
+```
+
+Then add the new qualifiers to the bean methods in `GameConfig.java`:
+
+```java
+@Configuration
+public class GameConfig {
+
+    // == fields ==
+    private int maxNumber = 25;
+    private int guessCount = 8;
+
+    // == bean methods ==
+    @Bean
+    @MaxNumber
+    public int maxNumber() {
+        return maxNumber;
+    }
+
+    @Bean
+    @GuessCount
+    public int guessCount() {
+        return guessCount;
+    }
+}
+```
+
+And add the new qualifier to the fields, that are autowired:
+```java
+class GameImpl {
+  @Autowired
+  @GuessCount
+  private int guessCount;
+}
+
+class NumberGeneratorImpl {
+  @Autowired
+  @MaxNumber
+  private int maxNumber;
+}
+```
+
+> Now we can use any method name in the bean methods, as well as any field name.
+
+## Autowire from a properties file
+
+- How to use `@Value` annotation
+- How to use `@PropertySource` annotation
+- How to inject values from a properties file
+
+The idea is to remove the hard coded fields in GameConfig (`maxNumber` and `guessCount`) and load the from a porperties file.
+
+- Create a `game.properties` file in the resource folder of the core module: `resources/config/game.properties`
+```properties
+# game properties
+game.maxNumber = 100
+game.guessCount = 10
+````
+- Load the properties file in the `GameConfig` class:
+```java
+@Configuration
+@PropertySource("classpath:config/game.properties")
+public class GameConfig {
+}
+```
+- assign the properties to the fields by using the `@Value` annotation
+- the number after the `:` is default value, if no matching property is found
+```java
+@Configuration
+@PropertySource("classpath:config/game.properties")
+public class GameConfig {
+
+    // == fields ==
+    @Value("${game.maxNumber:20}")
+    private int maxNumber;
+    
+    @Value("${game.guessCount:5}")
+    private int guessCount;
 }
 ```

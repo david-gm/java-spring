@@ -1,6 +1,6 @@
 package academy.learnprogramming.console;
 
-import academy.learnprogramming.AppConfig;
+import academy.learnprogramming.config.AppConfig;
 import academy.learnprogramming.Game;
 import academy.learnprogramming.MessageGenerator;
 import academy.learnprogramming.NumberGenerator;
