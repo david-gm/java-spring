@@ -16,7 +16,7 @@ public class GameImpl implements Game {
     @Autowired
     private NumberGenerator numberGenerator;
     @Autowired
-    @GuessCount
+    @GuessCount // custom qualifier: makes sure, that the correct bean type is autowired, even if the names do not match
     private int guessCount;
     private int number;
     private int guess;
@@ -30,10 +30,10 @@ public class GameImpl implements Game {
     @PostConstruct
     @Override
     public void reset() {
-        smallest = 0;
-        guess = 0;
+        guess = numberGenerator.getMinNumber();
         remainingGuesses = guessCount;
         biggest = numberGenerator.getMaxNumber();
+        smallest = numberGenerator.getMinNumber();
         number = numberGenerator.next();
         log.debug("the number is {}", number);
     }
