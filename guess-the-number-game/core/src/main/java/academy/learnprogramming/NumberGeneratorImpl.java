@@ -1,6 +1,5 @@
 package academy.learnprogramming;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Random;
@@ -16,7 +15,6 @@ public class NumberGeneratorImpl implements NumberGenerator {
     private final int minNumber;
 
     // == constructors ==
-    @Autowired
     public NumberGeneratorImpl(@MaxNumber int maxNumber, @MinNumber int minNumber) {
         this.maxNumber = maxNumber;
         this.minNumber = minNumber;

@@ -497,9 +497,17 @@ public class NumberGeneratorImpl implements NumberGenerator {
   - instead of using the `@Autowire` annotation on fields, we use `@Autowired` to the constructor
   - it is common practice to make the instance variables, that we set through the constructor `final`
   - note that custom qualifiers are used for `maxNumber` and `minNumber`
+  
+- remove the `@Autowired` from the fields
+- add a constructor with the fields that need to be injected and add `@Autowired` to the constructor
+- the fields injected can now be final.
+- > **NOTE** `@Autowired` annotation on a constructor is no longer necessary if the target bean defines only one constructor to begin with.
+  > However, if several constructors are available and there is no primary/default constructor, 
+  > at least one of the constructors must be annotated with @Autowired in order to instruct the container which one 
+  > to use.
+
 ```java
 public class NumberGeneratorImpl implements NumberGenerator {
-    @Autowired
     public NumberGeneratorImpl(@MaxNumber int maxNumber, @MinNumber int minNumber) {
       this.maxNumber = maxNumber;
       this.minNumber = minNumber;

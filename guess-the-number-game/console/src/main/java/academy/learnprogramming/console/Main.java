@@ -1,6 +1,6 @@
 package academy.learnprogramming.console;
 
-import academy.learnprogramming.config.AppConfig;
+import academy.learnprogramming.config.GameConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -15,7 +15,7 @@ public class Main {
 
         // create the context (container)
         // NOTE: using an interface (left) and a class to the right
-        ConfigurableApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        ConfigurableApplicationContext context = new AnnotationConfigApplicationContext(GameConfig.class);
         // close context (container) - doing that to prevent any memory resource leaks
         context.close();
     }
