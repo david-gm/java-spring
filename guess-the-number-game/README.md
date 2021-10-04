@@ -515,3 +515,27 @@ public class NumberGeneratorImpl implements NumberGenerator {
   }
 ```
 
+## Lombock
+
+### In IntelliJ
+
+- install lobock plugin in IntelliJ (preferences->plugins)
+- enable annotation processor (preferences->bil, exection, deployment->anntoation procesors-> enable annotation processing)
+
+### Lombock dependency in pom.xml
+
+add dependency of maven to pom.xml:
+```
+<dependency>
+    <groupId>org.projectlombok</groupId>
+    <artifactId>lombok</artifactId>
+    <version>1.18.20</version>
+    <scope>provided</scope>
+</dependency>
+```
+
+### Some Lombok Annotations
+
+- `@Sl4j`: log is available in the class: `final org.sl4f.Logger log`
+- `@Getter`: at class level: creates getters for all private members
+- `@Setter(AccessLevel.NONE)`: on a member sets no setter for a specific member
