@@ -40,3 +40,95 @@ Servlets: are JAVA-classes, who's instances inside a web-server handle client re
   <version>3.2.0</version>
   </plugin>
 ```
+- maven-cargo-plugin: we can manipulate use goals to manipulate war projects within the Apache Tomcat severlet container.
+  We can run tomcat in embedded mode.
+- add cargo-maven2-plugin to plugins in `pom.xml`
+- within the `configuration`: a tomcat9x container is specified, and it is set to embedded so that out application is 
+deployed within the embedded cargo tomcat webserver. So there is no need to install a tomcat server on our own.
+- to run the cargo plugin, go to maven goals, open the plugins section -> cargo -> cargo:run   
+- browse to http://localhost:8080/todo-list/
+```xml
+<plugin>
+    <groupId>org.codehaus.cargo</groupId>
+    <artifactId>cargo-maven2-plugin</artifactId>
+    <version>1.6.7</version>
+    <configuration>
+        <container>
+            <containerId>tomcat9x</containerId>
+            <type>embedded</type>
+        </container>
+    </configuration>
+</plugin>
+```
+
+## Setup Spring MVC Dispatcher Servlet
+
+- setup using Java configuration instead of an XML files
+- The Dispatcher Servlet is the front controller of Spring MVC and is used to dispatch HTTP requests to other controls
+- Two ways to register a servlet in our application:
+  - web.xml
+  - register programmatically by Java code
+- create a new package in `src/main/java`: `academy.learnprogramming.config`
+- new class `WebConfig`
+- add annotations, so that it becomes a configuration spring class. We also add the @EnableWebMvc annotation of spring
+```java
+@EnableWebMvc
+@Configuration
+@ComponentScan(basePackages = "academy.learnprogramming")
+public class WebConfig {
+}
+```
+
+- add servlet api to `pom.xml` file. The scope `provided` is there, so that the servlet container will provide 
+this dependency for us. We do not need to package that in our war file.
+```xml
+<dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>javax.servlet-api</artifactId>
+    <version>${servlet-api.version}</version>
+    <scope>provided</scope>
+</dependency>
+```
+
+- Servlet registration: we have to implment the WebApplicationInitializer interface
+- The interface will automatically be detected by Spring on startup
+
+```java
+public class WellAppIntializer implements WebApplicationInitializer {
+    @Override
+    public void onStartup(ServletContext servletContext) throws ServletException {
+        
+    }
+}
+```
+
+- then:
+    - create a new spring context and register our config class
+    - create a dispatcher servlet and provide the context object
+    - register and configure the dispatcher servlet
+
+```java
+public class WellAppIntializer implements WebApplicationInitializer {
+
+    private static final String DISPATCHER_SERVLET_NAME = "dispatcher";
+    private ServletRegistration.Dynamic registration;
+
+    @Override
+    public void onStartup(ServletContext servletContext) throws ServletException {
+
+        log.info("onStartup");
+        // create the spring application context
+        AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
+        context.register(WebConfig.class);
+
+        // create the dispatcher servlet
+        DispatcherServlet dispatcherServlet = new DispatcherServlet(context);
+
+        // register and configure the dispatcher servlet
+        ServletRegistration.Dynamic registration = servletContext.addServlet(DISPATCHER_SERVLET_NAME, dispatcherServlet);
+        registration.setLoadOnStartup(1);
+        registration.addMapping("/"); // overrides the default hompage servlet of tomcat and shows our own
+    }
+}
+```
+
