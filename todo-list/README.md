@@ -132,3 +132,40 @@ public class WellAppIntializer implements WebApplicationInitializer {
 }
 ```
 
+## Controller
+
+The Spring MVC is designed aound the Dispatcher Servlet which pays the role of Front Controller. It receives all of the
+requests for your application.
+ 
+We can map requests to methods in classes annotated with @Contrller. Those classes are known as annotated controllers or
+ controller classes. Spring MVC provides an annotation-based programming model where @Controller and @RestController use
+ annotations to express request mapping, request input, exception handling and more. Annotated controllers have flexible
+ method signatures and do not have to extend base classes or implement specific interfaces.  
+
+The @RequestMapping annotation is used to map requests to controller methods. It has various attributes to match by URL,
+HTTP method, request parameters, header, and media types.
+Shortcut variants of @RequestMapping are:
+- @GetMapping (for mapping HTTP GET requests)
+- @PostMapping (for mapping HTTP POST requests)
+- @PutMapping (for mapping HTTP PUT requests)
+- @DeleteMapping (for mapping HTTP DELETE requests)
+- @PatchMapping (for mapping HTTP PATCH requests)
+
+Create a controller class: `academy.learnprogramming.controller.DemoController`
+
+```java
+@Controller
+public class DemoController {
+
+    // http://localhost:8080/todo-list/hello
+    @ResponseBody()
+    @GetMapping("/hello")
+    public String hello() {
+        return "hello";
+    }
+}
+```
+
+The `@Controller` annotation is a specialisation of the `@Component` annotation and indicates that the annotated class 
+is a web controller. In order to return content back to the user directly from the controller withut a view, we need to
+add the `@ResponseBody` annotation to the method. Otherwise we would get an error, since the view is expected.
