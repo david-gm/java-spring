@@ -169,3 +169,50 @@ public class DemoController {
 The `@Controller` annotation is a specialisation of the `@Component` annotation and indicates that the annotated class 
 is a web controller. In order to return content back to the user directly from the controller withut a view, we need to
 add the `@ResponseBody` annotation to the method. Otherwise we would get an error, since the view is expected.
+
+## View Resolver and View
+
+The Spring MVC defines ViewResolver and View interfaces which enable us to render models in a browser without forcing us
+to use specific view technology.
+ViewResolver provides mapping between view names and actual views. For example, we can use JSP(Java Server Pages), 
+Thymeleaf, Freemarker and so on. JSP is a text document that contains two types of text: static data, which can be 
+expressed in any text-based format (such as HTML), and JSP elements, which construct dynamic content.
+We use the JavaServer Pages Standard Tag Library (JSTL). JSTL is a component of the Java EE Web application development 
+platform.
+
+- Create a `view` folder in the `WEB-INF` directory, since all files in that directory are not directly accessible via 
+the browser. Add a `welcome.jsp` file. Add some basic html content to the jsp file (only static content for now).
+
+Then we have to create the view resolver bean in the `WebConfig` class:
+Every view has a name, in our case `welcome` view. When the DispatcherServlet get the request for that JSP page, the prefix and
+suffix will be the added to the files.
+
+```java
+public class WebConfig {
+
+    // == constants ==
+    public static final String RESOLVER_PREFIX = "/WEB-INF/view/";
+    public static final String RESOLVER_SUFFIX = ".jsp";
+
+    // == bean methods ==
+    @Bean
+    public ViewResolver viewResolver() {
+        UrlBasedViewResolver viewResolver = new InternalResourceViewResolver();
+        viewResolver.setPrefix(RESOLVER_PREFIX);
+        viewResolver.setSuffix(RESOLVER_SUFFIX);
+        return viewResolver;
+    }
+}
+```
+In the `DemoController.java` class, we add a new method, that returns the view name as a string. Note, that we do 
+not need the foward slash for the `@GetMapping` annotation, this is added automatically.
+
+```java
+// http://localhost:8080/todo-list/welcome
+// prefix + name + suffix
+// /WEB-INF/view/welcome.jsp
+@GetMapping("welcome")
+public String welcome() {
+    return "welcome"; // represents the logical view name
+}
+```

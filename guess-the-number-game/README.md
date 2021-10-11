@@ -37,7 +37,7 @@ public class Store {
 }
 ```
 
-## Possible Dependency Incejtion methods in Spring:
+## Possible Dependency Injection methods in Spring:
 - Constructor based DI
 In a class (`GameImpl`), the `NumberGenerator` is a dependency:
 ```java
@@ -149,7 +149,7 @@ Other possible annotations:
 ## Autowiring Beans
 
 - `@Autowired` annotation can be used with constructor and setter based DI
-- here we injecting to instance fields
+- here, we are injecting to instance fields
 - best practice: constructor injection
   - in practice this means adding `@Autowired` to a constructor instead of the field
   - recommended by the Spring team: enables you to implement application components as immutable objects to ensure that required dependencies are not null
