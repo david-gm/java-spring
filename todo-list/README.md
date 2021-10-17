@@ -216,3 +216,71 @@ public String welcome() {
     return "welcome"; // represents the logical view name
 }
 ```
+## Spring MVC Request Processing
+
+![](spring-mvc-request-processing.png)
+
+1. The browser creates a request to a specific url. The Dispatcher Servlet receives the request from the server.
+2. The Dispatcher Servlet needs to identify which controller will handle the request. It uses handler mapping to find 
+the correct controller. 
+3. Handler mapping returns the specific handler method that handles the request.
+4. The Dispatcher Servlet calls the specific handler method of a controller.
+5. The handler method returns the model and the view name.
+6. The Dispatcher servlet has the view name as string
+7. The View Resolver uses the view name to identify the correct view.
+8.  The DS executes the view.
+9. The view is rendered and is returned to the Dispatcher Servlet.
+10. The view is returned to the browser.
+
+## Model and Model Attributes
+
+- Model: Model Interface defines a holder for model attribute. That model is exposed to the view so that the view can 
+access those model attributes.
+
+
+Add a model to the controller `DemoController`:
+- add an attribute "user" to the model
+- that model is automatically exposed to the view
+```java
+// http://localhost:8080/todo-list/welcome
+@GetMapping("welcome")
+public String welcome(Model model) {
+    model.addAttribute("user", "David");
+    log.info("model = {}", model);
+    // prefix + name + suffix
+    // /WEB-INF/view/welcome.jsp
+    return "welcome"; // represents the logical view name
+}
+```
+
+- the view can access the attribute with curly brackets:
+```jsp
+<html>
+<head>
+    <title>Welcome</title>
+</head>
+<body>
+    <h1>Hello ${user}</h1>
+</body>
+</html>
+```
+
+Another way to add attributes to a model is by using annotations:
+We use the `@ModelAttribute` annotation to add attributes to our model.
+This creates a new attribue `welcomeMessage` that can be used by any view.
+```java
+@ModelAttribute("welcomeMessage")
+public String welcomeMessage() {
+    log.info("welcomeMessage() called");
+    return "Welcome to this Demo application";
+}
+```
+test.jsp:
+```jsp
+<html>
+    <body>
+        TEST
+        <div>${welcomeMessage}</div>
+    </body>
+</html>
+```
