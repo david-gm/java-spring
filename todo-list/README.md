@@ -284,3 +284,63 @@ test.jsp:
     </body>
 </html>
 ```
+## A simple service
+
+- Service: it is a stereotype for the service layer. The @Service annotation will be scanned by spring. The service
+layer typically hold the business logic of the application. Controllers will use those servers.
+- create a demo service (interface + implementation) in a new package `service`:
+
+```java
+public interface DemoService {
+    String getHelloMessage(String user);
+
+    String getWelcomeMessage();
+}
+```
+
+- Implement that interface and add the @Service annotation
+```java
+@Service
+public class DemoServiceImpl implements DemoService {
+
+    @Override
+    public String getHelloMessage(String user) {
+        return "Hello " + user;
+    }
+
+    @Override
+    public String getWelcomeMessage() {
+        return "Welcome to this Demo application";
+    }
+}
+```
+
+- Now use the service by Constructer based DI in the controller by using `@Autowired`:
+```java
+@Controller
+public class DemoController {
+
+    private final DemoService demoService;
+    
+    @Autowired
+    DemoController(DemoService demoService) {
+        this.demoService = demoService;
+    }
+
+    // http://localhost:8080/todo-list/welcome
+    @GetMapping("welcome")
+    public String welcome(Model model) {
+        model.addAttribute("hello", demoService.getHelloMessage("David"));
+        log.info("model = {}", model);
+        // prefix + name + suffix
+        // /WEB-INF/view/welcome.jsp
+        return "welcome"; // represents the logical view name
+    }
+
+    @ModelAttribute("welcomeMessage")
+    public String welcomeMessage() {
+        log.info("welcomeMessage() called");
+        return demoService.getWelcomeMessage();
+    }
+}
+``` 
